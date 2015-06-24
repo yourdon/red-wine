@@ -14,11 +14,11 @@ theme_set(theme_classic())
 wine <- read.csv('wineQualityReds.csv')
 ```
 
-## Abstract
+## Summary
 
 In this brief, we explore the [Red Wine Quality dataset](http://www3.dsi.uminho.pt/pcortez/wine/) from P. Cortez et al., available through [UCI's ML repository](https://archive.ics.uci.edu/ml/datasets/Wine+Quality) in an effort to see what properties are relevant to wine quality. 
 
-The dataset collects observations on a variety of chemical features of Vinho Verde red wines, along with the median rating of those wines by at least three experts. We observe moderate correlations between quality and two variables -- alcohol level and volatile acidity -- and weaker correlations with two other varibles, sulphates and and citric acid. 
+The dataset collects observations on a variety of chemical features of Vinho Verde red wines, along with the median rating of those wines by at least three experts. We observe moderate correlations between quality and two variables -- alcohol level and volatile acidity -- and weaker correlations with two other variables, sulphates and citric acid. 
 
 ![Summary](summary.png)
 
