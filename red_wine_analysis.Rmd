@@ -24,7 +24,7 @@ Ultimately, we find that that two chemical properties -- alcohol level and volat
 
 ## Overview of the dataset 
 
-Having verified that there are no null values in the dataset, let's take a look at its shape:
+Let's verify that there are no null values in the dataset. Then we can take a look at its shape.
 
 ```{r message=FALSE, warning=FALSE}
 sapply(wine, function(x)sum(is.na(x)))
