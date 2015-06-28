@@ -6,6 +6,8 @@ Exploratory data analysis and modeling of the relationship between chemical feat
 Running
 -------
 
-The `html` file can be viewed with any browser.
+You can view the analysis online [here](https://cdn.rawgit.com/yourdon/red-wine/master/red_wine_analysis.html), thanks to [RawGit](http://rawgit.com/)
 
-The `Rmd` (R markdown) file can be accessed with RStudio, or the R IDE of your choice. Please make sure the relevant packages loaded at the top of the file are installed, using `install.packages("<package name>")`.
+The `html` file can also be downloaded and viewed locally with any browser.
+
+The `Rmd` (R markdown) file, where the analysis was actually done, can be accessed with RStudio, or the R IDE of your choice. From there, you can interact with the data. Please make sure the relevant packages loaded at the top of the file are installed, using `install.packages("<package name>")`.
