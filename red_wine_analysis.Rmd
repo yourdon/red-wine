@@ -533,7 +533,7 @@ ggplot(aes(x = chlorides, y = quality), data = wine) +
             y = "Quality"))
 ```
 
-From this plot, we would think that the "correlation" is due in large part to the extremes. We see a few data points around x = 0 pulling the fit up and a few around x = 0.6 dragging it down. What does the fit look like when we remove these?
+From this plot, we would think that the "correlation" is due in large part to the extremes. We see a few data points around x = 0 pulling the fit up and a few high-leverage data points around x = 0.6 dragging it down. What does the fit look like when we remove these points?
 
 ```{r message=FALSE, warning=FALSE}
 wine2 <- wine[(wine$chlorides > min(wine$chlorides)) & 
@@ -601,7 +601,7 @@ summary(lm.fit)
 
 The regression coefficient drops a little but remains the same order of magnitude.
 
-Using a backward selection process, we'll now remove all the other predictors -- including chlorides -- from the multiple regression model and see where we stand. Since none of our predictors are pairwise correlated, we won't worry about interaction terms.
+Using an accelerated backward selection process, we'll now remove all the other predictors -- including chlorides -- from the multiple regression model and see where we stand. Since none of our predictors are pairwise correlated, we won't worry about interaction terms.
 
 ```{r message=FALSE, warning=FALSE}
 lm.fit2 <- lm(quality ~ alcohol + sulphates + volatile.acidity + 
