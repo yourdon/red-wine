@@ -18,9 +18,17 @@ wine <- read.csv('wineQualityReds.csv')
 
 In this brief, we explore the [Red Wine Quality dataset](http://www3.dsi.uminho.pt/pcortez/wine/) from P. Cortez et al., available through [UCI's ML repository](https://archive.ics.uci.edu/ml/datasets/Wine+Quality) [1]. The dataset collects observations on a variety of chemical features of Vinho Verde red wines, along with the median rating of those wines by at least three experts.
 
-Our aims are to analyze what chemical properties contribute to wine quality and to develop a preliminary model for predicting the quality of a particular wine, given its properties. The analysis might be of interest to Vinho Verde vintners, who could use it to refine their techniques and processes; the model might be of interest to importers or merchants, who could use it to tailor their purchases. Notably, there are no wines in this dataset with a quality score greater than 8 (or less than 3), so it will not be possible to say what makes for a truly excellent wine (or a truly terrible one).
+Our aims are to analyze what chemical properties contribute to wine quality and to develop a preliminary model for predicting the quality of a particular wine, given its properties. The analysis might be of interest to Vinho Verde vintners, who could use it to refine their techniques and processes; the model might be of interest to importers or merchants, who could use it to tailor their purchases. In order to make the results interpretable, we use a regression model, introducing non-linear terms sparingly.
 
-Ultimately, we find that that two chemical properties, alcohol level and volatile acidity, exhibit a strong linear relationship with wine quality, while two others, total sulfur dioxide and chlorides, exhibit a weak linear relationship with quality. A fifth feature -- sulphates, which are added to preserve freshness -- exhibit a strong but non-linear relationship with quality, suggesting that in the quest to preserve freshness, one can sometimes go too far. These results may offer some guidance to vintners and merchants of Vinho Verde red wine. 
+Our preliminary model takes the form:
+
+$$y \approx 0.05 + (0.35 \times alcohol) + (0.30 \times sulphates) -\\ 
+  (0.05 \times sulphates^2) - (0.23 \times volatile.acidity) - \\
+  (0.09 \times total.sulfur.dioxide) - (0.07 \times chlorides) + \epsilon,$$
+
+Note that the response and all of the predictors are **standardized**. We see that two chemical properties, alcohol level and volatile acidity, exhibit a strong linear relationship with wine quality; the former has a positively association with quality, while the latter has a negative association. Two other features, total sulfur dioxide and chlorides, exhibit a weak negative relationship with quality. A fifth feature, sulphates, exhibits a strong but non-linear relationship with quality. **The headline therefore reads: Higher-quality wines are associated with higher alcohol content, lower volatile acidity, and high (but not extreme) levels of sulphates.**
+
+One shouldn't attempt to generalize these results too far. Notably, there are no wines in this dataset with a quality score greater than 8 (or less than 3), so it's not possible to say what makes for a truly Vinho Verde red wine (or a truly terrible one). There is also no reason to expect that these results will hold for other varieties of wine. Nevertheless, the results may offer some guidance to vintners and merchants of Vinho Verde red wine. 
 
 ## Overview of the dataset 
 
