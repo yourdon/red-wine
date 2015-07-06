@@ -18,17 +18,17 @@ wine <- read.csv('wineQualityReds.csv')
 
 In this brief, we explore the [Red Wine Quality dataset](http://www3.dsi.uminho.pt/pcortez/wine/) from P. Cortez et al., available through [UCI's ML repository](https://archive.ics.uci.edu/ml/datasets/Wine+Quality) [1]. The dataset collects observations on a variety of chemical features of Vinho Verde red wines, along with the median rating of those wines by at least three experts.
 
-Our aims are to determine what chemical properties contribute to wine quality and to develop a lightweight regression model for predicting the quality of a particular wine, given its properties. The former analysis might be of interest to Vinho Verde vintners, who could use it to refine their techniques and processes; the latter model might be of interest to importers or merchants, who could use it to tailor their purchases. Notably, there are no wines with a quality score greater than 8 (or less than 3), so it will not be possible to say what makes for a truly excellent wine (or a truly terrible one).
+Our aims are to analyze what chemical properties contribute to wine quality and to develop a preliminary model for predicting the quality of a particular wine, given its properties. The analysis might be of interest to Vinho Verde vintners, who could use it to refine their techniques and processes; the model might be of interest to importers or merchants, who could use it to tailor their purchases. Notably, there are no wines in this dataset with a quality score greater than 8 (or less than 3), so it will not be possible to say what makes for a truly excellent wine (or a truly terrible one).
 
-Ultimately, we find that that two chemical properties -- alcohol level and volatile acidity -- exhibit a strong linear relationship with wine quality, while two others -- total sulfur dioxide and chlorides -- exhibit a weak relationship with quality. A fifth feature -- sulphates, which are added to preserve freshness -- exhibit a strong but non-linear relationship with quality, suggesting that in the quest to preserve freshness, one can sometimes go too far. These results may offer some guidance to vintners and merchants of Vinho Verde red wine. 
+Ultimately, we find that that two chemical properties, alcohol level and volatile acidity, exhibit a strong linear relationship with wine quality, while two others, total sulfur dioxide and chlorides, exhibit a weak linear relationship with quality. A fifth feature -- sulphates, which are added to preserve freshness -- exhibit a strong but non-linear relationship with quality, suggesting that in the quest to preserve freshness, one can sometimes go too far. These results may offer some guidance to vintners and merchants of Vinho Verde red wine. 
 
 ## Overview of the dataset 
 
 Let's verify that there are no null values in the dataset. Then we can take a look at its shape.
 
 ```{r message=FALSE, warning=FALSE}
-sapply(wine, function(x)sum(is.na(x)))
-str(wine[c(2:13)])
+sum(is.na(wine))
+str(wine[2:13])
 ```
 
 We have nearly 1,600 observations of 11 independent variables and 1 response variable, quality. Quality is integer-valued -- a rating from 1 to 10 -- but all the other variables are continuous-valued. Some of the variables, such as pH, are fairly familiar; others, such as volatile acidity, are not.
@@ -36,7 +36,7 @@ We have nearly 1,600 observations of 11 independent variables and 1 response var
 We'll take a look at summary statistics next:
 
 ```{r message=FALSE, warning=FALSE}
-summary(wine[c(2:13)])
+summary(wine[2:13])
 ```
 
 The response variable, quality, has a minimum of 3 and a maximum of 8. In other words, the dataset doesn't contain any extremely low-quality wines, nor does it contain any extremely low-quality wines. Most wines received either a 5 or a 6 rating. The narrow range suggests that it may prove difficult to tease out what makes for a good red wine.
@@ -68,7 +68,7 @@ ggplot(aes(x = quality), data = wine) +
 summary(wine$quality)
 ```
 
-As we saw above, quality is integer-valued. The distribution is fairly normal, with a mean of 5.64, a slightly negative skew, and short tails. Some wines are quite good, but not many; even fewer are quite bad. There are no wines with a score greater than 8 or less than 3, so there are no truly exceptional or truly terrible wines in our sample.
+As we saw above, quality is integer-valued. The distribution is fairly normal, with a mean of 5.64, a slightly negative skew, and short tails. Some wines are quite good, but not many; even fewer are quite bad.
 
 ### Alcohol
 
@@ -81,11 +81,9 @@ ggplot(aes(x = alcohol), data = wine) +
 summary(wine$alcohol)
 ```
 
-Most wines are in the 9%-12% alcohol by volume (abv) range, with a peak around 9% abv and a mean of 10.42% abv. The range is 8.4%-14.90%. The histogram is positively skewed.
+Most wines are in the 9%-12% alcohol by volume (abv) range, with a peak around 9% abv and a mean of 10.42% abv. The range is 8.4%-14.90%. The distribution is positively skewed.
 
-In the greater context of wine, this plot is surprising. Most red wines fall in the 12%-16% abv range, whereas the wines in this dataset are mostly in the 9%-12% abv range. It turns out, though, such a range is common for Vinho Verde [2], so our data seem trustworthy, and since 14.9% is still a reasonable abv for red wine in general, we won't exclude any high-abv wines. 
-
-That said, given the lower alcohol content of Vinho Verde, we should not presume to generalize any findings here to red wine in general.
+In the greater context of wine, this histogram is surprising. Most red wines fall in the 12%-16% abv range, whereas the wines in this dataset are mostly in the 9%-12% abv range. It turns out, however, that such a range is common for Vinho Verde [2], so our data seem trustworthy. And since 14.9% is still a reasonable abv for red wine in general, we won't exclude any of the high-abv wines here. That said, given the lower alcohol content of Vinho Verde, we should not presume to generalize any findings here to red wine in general.
 
 ### pH
 
@@ -112,9 +110,7 @@ ggplot(aes(x = residual.sugar), data = wine) +
 summary(wine$residual.sugar)
 ```
 
-Here, we see a much more irregular distribution here, with a very long tail. One wonders how the judges will rate wines for which the residual sugar level resides in this tail.
-
-We can see whether a log transformation of this variable yields a distribution that's more normal in appearance:
+Here, we see a more irregular distribution, with a long tail. We can see whether a log transformation of the residual.sugar variable yields a distribution that's more normal in appearance:
 
 ```{r message=FALSE, warning=FALSE}
 ggplot(aes(x = log(residual.sugar)), data = wine) +
@@ -137,7 +133,7 @@ ggplot(aes(x = volatile.acidity), data = wine) +
 summary(wine$volatile.acidity)
 ```
 
-This distribution is fairly normal, with some noise near the mean of the distribution. There is, again, a tail on the positive end of the distribution. Some of these values fall outside the U.S. legal limit for volatile acidity, which is 1.2 g/dm^3, but no so far beyond that limit as to deserve exclusion from the dataset. 
+This distribution is fairly normal, with some variability near the mean of the distribution. There is, again, a tail on the positive end of the distribution. Some of these values fall outside the U.S. legal limit for volatile acidity, which is 1.2 g/dm^3, but not so far beyond that limit as to deserve exclusion from the dataset. 
 
 ### Chlorides
 
@@ -207,7 +203,7 @@ ggplot(aes(x = volatile.acidity, y = citric.acid), data = wine) +
             x = "Volatile acidity (g/dm^3)", y = "Citric acid (g/dm^3)"))
 ```
 
-The answer seems to be "no" in the first case and "yes" in the second. There is no discernible relationship between volatile acidity and fixed acidity; the relationship between volatile acidity and citric acid, meanwhile, is negative. As volatile acidity increases, citric acid tends to decrease.
+The answer seems to be "not really" in the first case and "somewhat" in the second. There is no strong relationship between volatile acidity and fixed acidity; the relationship between volatile acidity and citric acid, meanwhile, is moderate negative. As volatile acidity increases, citric acid tends to decrease.
 
 What about for the "sulfur"-like variables?
 
@@ -227,26 +223,27 @@ ggplot(aes(x = total.sulfur.dioxide, y = sulphates), data = wine) +
   labs(list(title = "Sulphates vs. total sulfur dioxide", 
             x = "Total sulfur dioxide (mg/dm^3)", 
             y = "Sulphates (mg/dm^3)"))
+
 ```
 
-The first pair of variables have a strong positive correlation, but the second pair is largely unrelated. Our assumptions, not surprisingly, were not valid.
+The first pair of variables have a strong positive correlation, but the second pair is basically unrelated. Our assumptions, not surprisingly, were not valid.
 
 ### Scatterplot matrix
 
-A more efficient way to determine which variables are correlated with each other and, more importantly, with our response variable, is to look at a scatterplot matrix. We'll use the psych package to do so. We'll also take that as a jumping off point into other bivariate analyses.
+A more efficient way to determine which variables are correlated with each other and, more importantly, with our response variable, is to look at a scatterplot matrix. We'll use the psych package to do so. We'll also take this as a jumping off point into other bivariate analyses.
 
 ```{r message=FALSE, warning=FALSE}
-set.seed(2000)
-pairs.panels(sample_n(wine[c(2:13)],1599),pch=".")
+set.seed(1)
+pairs.panels(sample_n(wine[2:13],1599),pch=".")
 ```
 
 We learn many interesting things from this matrix. First, we get Pearson correlations amongst the "acid"-like variables and the "sulfur"-like variables.
 
-* Fixed.acidity and citric.acid are fairly well-correlated (r = 0.67), while volatile.acidity and citric.acid are fairly anti-correlated (r = -0.55), suggesting that we would be wise not to include both in a linear regression model. But perhaps we should include _neither_, given that fixed.acidity is hardly correlated with quality and citric.acid has an unruly distribution. Volatile.acidity is moderately correlated with the unruly citric.acid, meanwhile, but only weakly correlated with fixed.acidity.
+* Fixed.acidity and citric.acid are fairly well-correlated (r = 0.67), suggesting that we would be wise not to include both fixed.acidity and citric.acid in a linear regression model. But perhaps we should include _neither_, given that fixed.acidity is hardly correlated with quality and citric.acid has an unruly distribution. Meanwhile, volatile.acidity is moderately correlated with the unruly citric.acid (r = -0.55), but only weakly correlated with fixed.acidity.
 
 * With respect to "sulfur"-like variables, total.sulfur.dioxide and free.sulfur.dioxide are strongly correlated (r = 0.67), but neither is correlated with sulphates. Of these three, sulphates has the strongest correlation with quality. Yet it's not a purely linear relationship, as we can see in the line of best fit.
 
-More interesting, of course, is how all the variables relate to quality. We can classify variables as "moderate" or "weak" according to their r value. 
+More interesting, of course, is how all the variables relate to quality. We can classify variables as "moderate" or "weak" according to their corrrelation score. 
 
 **Moderate correlations (0.3 < r < 0.5)**
 
@@ -282,7 +279,7 @@ ggplot(aes(x = alcohol, y = quality), data = wine) +
 
 The correlation noted in the matrix is evident in the scatterplot too. An interesting structure to observe is that up to about alcohol = 10% abv, a significant majority of the wines have a quality score of *less* than 6, while beyond alcohol = 12% abv, a significant majority have a quality score of *greater* than 6, but that between these two values of alcohol, there is greater variability. 
 
-We also see the lone high-alcohol wine, with abv = 14.9%, dragging down the trend line. It would be interesting to collect more data on wines at this abv level and see whether quality does tend to drop.  
+We also see the lone high-alcohol wine, with abv = 14.9%, dragging down the trend line. It would be interesting to collect more data on wines at this abv level.  
 
 ### Quality vs. volatile acidity
 
@@ -295,7 +292,7 @@ ggplot(aes(x = volatile.acidity, y = quality), data = wine) +
             y = "Quality"))
 ```
 
-We see evidence here of the negative trend already described. As volatile acidity increases, quality tends to decrease. Interestingly, though, for particularly low values of volatile acidity, the trend is reversed, and this variable becomes positively correlated with quality, suggesting that a little bit of acidity (or bitterness) is a good thing.
+We see evidence here of the negative trend already described. As volatile acidity increases, quality tends to decrease. For particularly low values of volatile acidity, the trend is reversed, and this variable becomes positively correlated with quality, suggesting that a little bit of acidity (or bitterness) is a good thing. Of course, this may just be an edge effect.
 
 ### Quality vs. sulphates
 
@@ -310,7 +307,7 @@ ggplot(aes(x = sulphates, y = quality), data = wine) +
 
 The weak linear trend indicated in the scatterplot matrix can now be recognized as a non-linear relationship. As the sulphates level increases from its minimum, the oxidation of the wine decreases, and quality improves. At a certain sulphate level, though, the trend reverses, and quality starts going down. 
 
-The non-linearity induced by high-sulphate values, which starts around sulphates = 0.9 g/dm^3, doesn't appear to be the artifact of a small sample size. There are 59 wines with a sulphate values greater than or equal to 0.9, or roughly 7% of the dataset.
+The non-linearity induced by high-sulphate values, which starts around sulphates = 0.9 g/dm^3, doesn't appear to be of a few high-leverage observations. There are 59 wines with a sulphate values greater than or equal to 0.9, or roughly 7% of the dataset.
 
 ```{r message=FALSE, warning=FALSE}
 count(subset(wine, sulphates >= 0.9))
@@ -329,7 +326,7 @@ ggplot(aes(x = citric.acid, y = quality), data = wine)  +
             y = "Quality"))
 ```
 
-Overall, we see the basic weak, but positive trend that we expected. There are some unexpected "flatlines" in the curve here. Between citric acid values of 0.0 and 0.2, and again between 0.4 and 0.5, quality doesn't seem to change much.
+Overall, we see the basic weak but positive trend that we expected. There are some unexpected "flatlines" in the curve here. Between citric acid values of 0.0 and 0.2, and again between 0.4 and 0.5, quality doesn't seem to change much.
 
 There are also some similarities to the quality vs. alcohol plot. There is a value of citric acid (~0.25 g/dm^3) below which high-quality wine are relatively uncommon. On the other end of the spectrum, there is a value of citric acid (~0.5 g/dm^3) above which low-quality wines are relatively uncommon.
 
@@ -365,7 +362,7 @@ wine$sulphates.bucket <- cut(wine$sulphates,
 
 ```
 
-Now let's see whether these multvariate plots reveal any additional patterns.
+Now let's see whether these multvariate plots reveal any additional structure.
 
 ### Quality vs. alcohol and other variables
 
@@ -395,7 +392,7 @@ ggplot(aes(x = alcohol, y = quality), data = wine) +
             color = "Citric acid (g/dm^3)"))
 ```
 
-As we might expect, the bucketed variables add extra explanatory power. At a given alcohol level, we see quality correlated with buckets in the ways we found earlier. For example, in the first plot, at a given alcohol level, we see a lower volatile acidity associated, on average, with a higher quality at every abv level.
+As we might expect, the bucketed variables add extra explanatory power. Holding alcohol level fixed, we see the variability in quality explained by the respective buckets in the directions we found earlier. For example, in the first plot, holding alcohol level fixed, we see a lower volatile acidity associated, on average, with a higher quality score.
 
 ### Quality vs. volatile and other variables
 
@@ -430,7 +427,7 @@ Again, the weakly correlated varibles add extra explanatory power to the two-dim
 
 ### Averaging by quartile
 
-At this point, it's natural to simplify our plots even further through aggregation. Taking the "quality vs. alcohol & sulphates" plot, let's see what happens to the quality-alcohol correlation when we average within sulphate quartiles.
+At this point, it's natural to simplify our plots even more through aggregation. Taking the "quality vs. alcohol & sulphates" plot, let's see what happens to the quality-alcohol correlation when we average within sulphate quartiles.
 
 ```{r message=FALSE, warning=FALSE}
 wine.group_by_sulphates.bucket <- wine %>%
@@ -469,7 +466,7 @@ ggplot(aes(x = alcohol, y = mean_quality),
             color = "Volatile acidity (g/dm^3)"))
 ```
 
-Again, a pattern emerges amidst the sea of dots. Most of the points above the smoothing curve have a low volatile acidity, confirming the trend we saw in our bivariate analysis.
+Again, a pattern emerges amidst the dots. Most of the points above the smoothing curve have a low volatile acidity, confirming the trend we saw in our bivariate analysis.
 
 A line graph, though noisy, makes the trend stand out better:
 
@@ -510,7 +507,7 @@ Now we can see that a wine with a very high sulphate concentration (sulphates > 
 
 ## A basic model
 
-Before wrapping up, we can fit a basic model to the data. We'll take advantage of R's modeling power here and regress on *all* possible predictors, even ones we haven't examined recently. First, we'll standardize our feature set in order to make the regression coefficents more interpretable.
+We can now fit a basic model to the data. We'll regress on *all* possible predictors, even ones we haven't examined recently. First, we'll standardize our feature set in order to make the regression coefficents more interpretable.
 
 ```{r message=FALSE, warning=FALSE}
 scalewine <- data.frame(scale(wine[, 2:13]))
@@ -555,12 +552,12 @@ cor(wine2$quality, wine2$chlorides)
 It drops only by 0.02. What about the regression coefficient?
 
 ```{r message=FALSE, warning=FALSE}
-scalewine <- data.frame(scale(wine[, 2:13]))
-lm.fit <- lm(quality ~ ., data=scalewine)
-summary(lm.fit)
+scalewine2 <- data.frame(scale(wine2[, 2:13]))
+lm.fit2 <- lm(quality ~ ., data=scalewine2)
+coef(lm.fit2)
 ```
 
-The p-value is still low, but the coefficient has gone from -1.1e-02 to -8.7e-02, suggesting that the strong presence of chlorides in the first model was artificial. The RSE and R-squared values are just as good, though, meaning that the second model is as good as the first.
+The p-value is still low, but the coefficient has gone from -1.1e-01 to -8.7e-02, suggesting that the strong presence of chlorides in the first model was artificial. The RSE and R-squared values are just as good, though, meaning that the second model is as good as the first.
 
 Next, we want to run total.sulfur.dioxide through the same sanity check. The first step is to examine a plot of quality vs. total.sulfur.dioxide:
 
@@ -594,38 +591,38 @@ cor(wine3$quality, wine3$total.sulfur.dioxide)
 Its magnitude increases (gets more negative) by 0.02. How about the regression coefficient?
 
 ```{r message=FALSE, warning=FALSE}
-scalewine <- data.frame(scale(wine3[, 2:13]))
-lm.fit <- lm(quality ~ ., data=scalewine)
-summary(lm.fit)
+scalewine3 <- data.frame(scale(wine3[, 2:13]))
+lm.fit3 <- lm(quality ~ ., data=scalewine3)
+coef(lm.fit3)
 ```
 
 The regression coefficient drops a little but remains the same order of magnitude.
 
-Using an accelerated backward selection process, we'll now remove all the other predictors -- including chlorides -- from the multiple regression model and see where we stand. Since none of our predictors are pairwise correlated, we won't worry about interaction terms.
+Taking a cue from backward selection, we'll now remove all the other predictors -- including chlorides -- from the multiple regression model and see where we stand. Since none of our predictors are pairwise correlated, we won't worry about interaction terms.
 
 ```{r message=FALSE, warning=FALSE}
 lm.fit2 <- lm(quality ~ alcohol + sulphates + volatile.acidity + 
-                total.sulfur.dioxide, data=scalewine)
+                total.sulfur.dioxide, data=scalewine2)
 summary(lm.fit2)
 ```
 
-All four predictors have a very low p-value and regression coefficients that, while not enormous, could contribute collectively to a not insignificant improvement in quality. To put it in more intelligible terms, if a vintner tweaked each of these four chemical factors by 1 unit (in this standardized scale), we could expect the quality rating to increase up `0.38 + 0.17 + |-0.26| + |-0.11| = 0.92 -- almost a full point!
+All four predictors have a very low p-value and regression coefficients that, while not enormous, could contribute collectively to a not insignificant improvement in quality. To put it in more intelligible terms, if a vintner tweaked each of these four chemical factors by 1 standard deviation (that is, 1 unit in this standardized scale), we could expect the quality rating to increase up `0.38 + 0.17 + |-0.26| + |-0.11| = 0.92 -- almost a full quality point!
 
-A couple troublesome points remain. First, the intercept for all of our model iterations thus far has not been significant. *Really* not significant: p = 1. So, although we are getting a good sense for how our predictors influence wine quality, if we wanted to use this model to actually predict how a judge would rate a new wine, we would be in trouble, because we don't have a baseline for the intercept in the model. Another trouble is that we know our sulphates feature has a non-linear relationship with quality. If we return to the quality vs. sulphates plot, we see that quality is positively correlated with sulphate levels, until about 0.8 mg/dm^3, at which point quality begins to dip. We have enough data points for sulphates > 0.8 to believe that this effect is real. 
+A couple troublesome points remain. First, the intercept for all of our model iterations thus far has not been significant. *Really* not significant: p = 1. So, although we are getting a good sense for how our predictors influence wine quality, if we wanted to use this model to actually predict how a judge would rate a new wine, we would be in trouble, because we don't have a baseline for the intercept in the model. Another trouble is that we know that our sulphates feature has a non-linear relationship with quality. If we return to the quality vs. sulphates plot, we see that quality is positively correlated with sulphates, until about 0.8 mg/dm^3, at which point quality begins to dip. We have enough data points for sulphates > 0.8 to believe that this effect is real. 
 
 How would our model change if we allowed a second-order sulphates term? If we try to account for that non-linearity in one of our most important predictors, will we recover a reliable intercept?
 
 ```{r message=FALSE, warning=FALSE}
-lm.fit3 <- lm(quality ~ alcohol + sulphates + volatile.acidity +
+lm.fit4 <- lm(quality ~ alcohol + sulphates + volatile.acidity +
                chlorides + total.sulfur.dioxide + 
-               I(sulphates^2), data=scalewine)
-summary(lm.fit3)
+               I(sulphates^2), data=scalewine2)
+summary(lm.fit4)
 ```
 
-And there it is! We have an intercept that is statistically significant (with p < 0.05), a model of quality that's linear in alcohol level, volatile acidity, chlorides, and total sulfur dioxides *and* quadratic in sulphates. We can run an ANOVA to confirm that this polynomial model outperforms our linear model:
+Now w have an intercept that is statistically significant (with p < 0.05), a model of quality that's linear in alcohol level, volatile acidity, and chlorides, *and* quadratic in sulphates. We could do k-fold cross-validation and compares the test error (RSS) of the quadratic model to our top-performing linear model, but a quicker way to compare the two is to run an ANOVA:
 
 ```{r message=FALSE, warning=FALSE}
-anova(lm.fit2, lm.fit3)
+anova(lm.fit2, lm.fit4)
 ```
 
 The ANOVA tells us with great confidence that the polynomial model outperforms the original model. 
@@ -634,9 +631,9 @@ The ANOVA tells us with great confidence that the polynomial model outperforms t
 
 One of the main challenges with this data set is the narrow range of quality ratings available and the discrete values that these quality scores take on. It would be instructive to analyze more extreme ratings (i.e. wines with ratings of 1, 2, 9, or 10) as well as more nuanced ratings (perhaps by taking the mean of the experts' ratings rather than the median).
 
-Nevertheless, after exploring the wines in this dataset and creating a regression model, we found two chemical features, alcohol content and volatile acidity, that seem to be strong predictors for wine quality. Two other features, total sulfur dioxide and chlorides, are weaker predictors. A fifth feature, sulphates, is a strong predictor, although its behavior is non-linear. Sulphates are used to preserve a wine's freshness. It may be that there's a "sweet spot"; too low a level of sulphates, and the wine doesn't taste fresh, but too high a level of sulphates, and it tastes overly preserved. Given more data or more varied data, we might discover similar sweet spots in the other features.
+Nevertheless, after exploring the wines in this dataset and fitting a regression model, we found two chemical features, alcohol content and volatile acidity, that seem to be strong predictors for wine quality. Two other features, total sulfur dioxide and chlorides, are weaker predictors. A fifth feature, sulphates, is a strong predictor, although its effects are non-linear. Sulphates, which are used to preserve a wine's freshness, may have a "sweet spot"; too low a level of sulphates, and the wine doesn't taste fresh, but too high a level of sulphates, and it tastes overly preserved. Given more data and/or more varied data, we might discover similar sweet spots in the other features.
 
-Finally, we note that Cortez et al. [built a predictive model](http://www3.dsi.uminho.pt/pcortez/wine5.pdf) of wine quality that exhibiits slightly different behavior. Our model and theirs share four of top predictors, though their model assign different weights to each feature. In addition, their model excludes chlorides as a feature and includes pH. Investigating the precise nature of these discrepancies is a subject for future exploration.  
+Finally, we note that Cortez et al. [developed their own predictive model](http://www3.dsi.uminho.pt/pcortez/wine5.pdf) of wine quality. Our model and theirs share four of five top predictors, though their model assign different weights to each feature. In addition, their model excludes chlorides as a feature and includes pH. Investigating the precise nature of these discrepancies is a subject for future exploration.
 
 ## References
 
