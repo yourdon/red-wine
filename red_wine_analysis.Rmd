@@ -625,7 +625,20 @@ Now w have an intercept that is statistically significant (with p < 0.05), a mod
 anova(lm.fit2, lm.fit4)
 ```
 
-The ANOVA tells us with great confidence that the polynomial model outperforms the original model. 
+The ANOVA tells us with great confidence that the polynomial model outperforms the original model. For a more accurate estimate of the standard error associated with each coefficient in the model, we can do some bootstrapping:
+
+```{r message=FALSE, warning=FALSE}
+library(boot)
+boot_coef <- function(data, index){
+  mylm <- lm(quality ~ alcohol + sulphates + volatile.acidity + 
+               chlorides + total.sulfur.dioxide +
+               I(sulphates^2), data=data, subset=index)
+  return(coef(mylm))
+}
+boot(scalewine2, boot_coef, 1000)
+```
+
+These standard errors are higher than the errors in the original model fit, but this is to be expected, given the assumption-breaking nonlinearity in the model and the fact that we fit the model on the entirety of the training data.
 
 ## Conclusion
 
