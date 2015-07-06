@@ -6,7 +6,7 @@ Exploratory data analysis and modeling of the relationship between chemical feat
 Running
 -------
 
-You can view the analysis online [here](https://cdn.rawgit.com/yourdon/red-wine/50b02cc9d850324bac63f0409a0c5d33f6bd39ec/red_wine_analysis.html), thanks to [RawGit](http://rawgit.com/).
+You can view the analysis online [here](https://cdn.rawgit.com/yourdon/red-wine/6fd7e3a9552db2df3ff0bec78e067d75a378401e/red_wine_analysis.html), thanks to [RawGit](http://rawgit.com/).
 
 The `html` file can also be downloaded and viewed locally with any browser.
 
