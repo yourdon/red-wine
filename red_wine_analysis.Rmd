@@ -11,7 +11,7 @@ theme_set(theme_classic())
 ```
 
 ```{r message=FALSE, warning=FALSE}
-wine <- read.csv('wineQualityReds.csv')
+wine = read.csv('wineQualityReds.csv')
 ```
 
 ## Summary
@@ -349,19 +349,19 @@ We now bring a third dimension into our exploratory analysis. The continuous-val
 ```{r message=FALSE, warning=FALSE}
 
 # Cut predictors into quartile-buckets
-wine$alcohol.bucket <- cut(wine$alcohol, 
+wine$alcohol.bucket = cut(wine$alcohol, 
                            c(quantile(wine$alcohol)))
 
-wine$volatile.acidity.bucket <- cut(wine$volatile.acidity,
+wine$volatile.acidity.bucket = cut(wine$volatile.acidity,
                            c(quantile(wine$volatile.acidity)))
 
-wine$sulphates.bucket <- cut(wine$sulphates,
+wine$sulphates.bucket = cut(wine$sulphates,
                            c(quantile(wine$sulphates)))
 
-wine$citric.acid.bucket <- cut(wine$citric.acid,
+wine$citric.acid.bucket = cut(wine$citric.acid,
                            c(quantile(wine$citric.acid)))
 
-wine$sulphates.bucket <- cut(wine$sulphates,
+wine$sulphates.bucket = cut(wine$sulphates,
                            c(quantile(wine$sulphates)[1],
                              quantile(wine$sulphates)[2],
                              quantile(wine$sulphates)[3],
@@ -438,7 +438,7 @@ Again, the weakly correlated varibles add extra explanatory power to the two-dim
 At this point, it's natural to simplify our plots even more through aggregation. Taking the "quality vs. alcohol & sulphates" plot, let's see what happens to the quality-alcohol correlation when we average within sulphate quartiles.
 
 ```{r message=FALSE, warning=FALSE}
-wine.group_by_sulphates.bucket <- wine %>%
+wine.group_by_sulphates.bucket = wine %>%
   filter(!is.na(sulphates.bucket)) %>%
   group_by(alcohol, sulphates.bucket) %>%
   summarise(mean_quality = mean(quality),
@@ -458,7 +458,7 @@ Sulphates do clearly explain some of that variance. Most of the points above the
 Let's examine a similar plot, this time averaging within volatile acidity quartiles.
 
 ```{r message=FALSE, warning=FALSE}
-wine.group_by_volatile.acidity.bucket <- wine %>%
+wine.group_by_volatile.acidity.bucket = wine %>%
   filter(!is.na(volatile.acidity.bucket)) %>%
   group_by(alcohol, volatile.acidity.bucket) %>%
   summarise(mean_quality = mean(quality),
@@ -518,8 +518,8 @@ Now we can see that a wine with a very high sulphate concentration (sulphates > 
 We can now fit a basic model to the data. We'll regress on *all* possible predictors, even ones we haven't examined recently. First, we'll standardize our feature set in order to make the regression coefficents more interpretable.
 
 ```{r message=FALSE, warning=FALSE}
-scalewine <- data.frame(scale(wine[, 2:13]))
-lm.fit <- lm(quality ~ ., data=scalewine)
+scalewine = data.frame(scale(wine[, 2:13]))
+lm.fit = lm(quality ~ ., data=scalewine)
 summary(lm.fit)
 ```
 
@@ -541,7 +541,7 @@ ggplot(aes(x = chlorides, y = quality), data = wine) +
 From this plot, we would think that the "correlation" is due in large part to the extremes. We see a few data points around x = 0 pulling the fit up and a few high-leverage data points around x = 0.6 dragging it down. What does the fit look like when we remove these points?
 
 ```{r message=FALSE, warning=FALSE}
-wine2 <- wine[(wine$chlorides > min(wine$chlorides)) & 
+wine2 = wine[(wine$chlorides > min(wine$chlorides)) & 
                (wine$chlorides < 0.5), ]
 ggplot(aes(x = chlorides, y = quality), data = wine2) + 
   geom_jitter(alpha=0.5, color=I('Blue')) +
@@ -560,8 +560,8 @@ cor(wine2$quality, wine2$chlorides)
 It drops only by 0.02. What about the regression coefficient?
 
 ```{r message=FALSE, warning=FALSE}
-scalewine2 <- data.frame(scale(wine2[, 2:13]))
-lm.fit2 <- lm(quality ~ ., data=scalewine2)
+scalewine2 = data.frame(scale(wine2[, 2:13]))
+lm.fit2 = lm(quality ~ ., data=scalewine2)
 coef(lm.fit2)
 ```
 
@@ -581,7 +581,7 @@ ggplot(aes(x = total.sulfur.dioxide, y = quality), data = wine) +
 Again, we see extreme values of the predictor driving the fit. Let's remove data points where x > 200.
 
 ```{r message=FALSE, warning=FALSE}
-wine3 <- wine2[wine2$total.sulfur.dioxide < 200, ]
+wine3 = wine2[wine2$total.sulfur.dioxide < 200, ]
 ggplot(aes(x = total.sulfur.dioxide, y = quality), data = wine3) + 
   geom_jitter(alpha=0.5, color=I('Blue')) +
   geom_smooth(color=I('red')) +
@@ -599,8 +599,8 @@ cor(wine3$quality, wine3$total.sulfur.dioxide)
 Its magnitude increases (gets more negative) by 0.02. How about the regression coefficient?
 
 ```{r message=FALSE, warning=FALSE}
-scalewine3 <- data.frame(scale(wine3[, 2:13]))
-lm.fit3 <- lm(quality ~ ., data=scalewine3)
+scalewine3 = data.frame(scale(wine3[, 2:13]))
+lm.fit3 = lm(quality ~ ., data=scalewine3)
 coef(lm.fit3)
 ```
 
@@ -609,7 +609,7 @@ The regression coefficient drops a little but remains the same order of magnitud
 Taking a cue from backward selection, we'll now remove all the other predictors -- including chlorides -- from the multiple regression model and see where we stand. Since none of our predictors are pairwise correlated, we won't worry about interaction terms.
 
 ```{r message=FALSE, warning=FALSE}
-lm.fit2 <- lm(quality ~ alcohol + sulphates + volatile.acidity + 
+lm.fit2 = lm(quality ~ alcohol + sulphates + volatile.acidity + 
                 total.sulfur.dioxide, data=scalewine2)
 summary(lm.fit2)
 ```
@@ -621,7 +621,7 @@ A couple troublesome points remain. First, the intercept for all of our model it
 How would our model change if we allowed a second-order sulphates term? If we try to account for that non-linearity in one of our most important predictors, will we recover a reliable intercept?
 
 ```{r message=FALSE, warning=FALSE}
-lm.fit4 <- lm(quality ~ alcohol + sulphates + volatile.acidity +
+lm.fit4 = lm(quality ~ alcohol + sulphates + volatile.acidity +
                chlorides + total.sulfur.dioxide + 
                I(sulphates^2), data=scalewine2)
 summary(lm.fit4)
@@ -637,8 +637,8 @@ The ANOVA tells us with great confidence that the polynomial model outperforms t
 
 ```{r message=FALSE, warning=FALSE}
 library(boot)
-boot_coef <- function(data, index){
-  mylm <- lm(quality ~ alcohol + sulphates + volatile.acidity + 
+boot_coef = function(data, index){
+  mylm = lm(quality ~ alcohol + sulphates + volatile.acidity + 
                chlorides + total.sulfur.dioxide +
                I(sulphates^2), data=data, subset=index)
   return(coef(mylm))
